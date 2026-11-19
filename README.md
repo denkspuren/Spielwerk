@@ -174,4 +174,4 @@ Die eigentliche Lehrschnittstelle (`CREATE`, `MOVE`, `TEXT`, `KEYDOWN`, `TICK`, 
 
 ## Lizenzen
 
-Die Implementierung und die SVG/Sound-Assets sind eigens für dieses Beispiel erstellt. Frei veränderbar und für die Lehre wiederverwendbar (MIT-Lizenz, siehe `LICENSE`).
+Die Implementierung und die SVG/Sound-Assets sind eigens für dieses Beispiel erstellt. Frei veränderbar und für die Lehre wiederverwendbar (CC0-Lizenz, siehe `LICENSE`).

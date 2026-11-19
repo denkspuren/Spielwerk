@@ -4,6 +4,8 @@
 
 Zwei vollständige Spiele in **normalem Java**, die ihre Grafiken in einem Browser ausgeben. **Zwei austauschbare Server** sind enthalten: ein Server in reinem **Java (JDK 17+)** und einer in der **Python-Standardbibliothek**. Beide verwenden dieselbe Browseroberfläche und dasselbe sprachunabhängige Zeilenprotokoll. **Kein pip, npm, Node, Framework, JSON oder zusätzliche Java-Bibliothek** erforderlich.
 
+**Hinweis**: Spielwerk basiert auf Ideen und Konzepten, die bei der Entwicklung einer Umgebung für das [Live View Programming](https://github.com/denkspuren/LiveViewProgramming) entstanden sind. Die Umsetzung und Dokumentation von Spielwerk hat ChatGPT übernommen.
+
 ## Handbuch für Studierende und zwei kleine Lernspiele
 
 Im Verzeichnis **[`docs/`](docs/README.md)** liegt ein deutschsprachiges, schrittweise aufgebautes [**Studierendenhandbuch**](docs/HANDBUCH.md) für Programmieren 1. Es erklärt das Zeilenprotokoll, die Eingabeverarbeitung, den Unterschied zwischen ereignis- und zeitgesteuerten Spielen, HTML/CSS-Vorlagen, die Erstellung von SVG-/PNG-Ressourcen, Sounds sowie die wichtige Frage nach Objektgrößen und Kollisionsberechnung. Ergänzend gibt es die [Protokollreferenz](docs/PROTOKOLL.md) und [Übungsaufgaben](docs/AUFGABEN.md).

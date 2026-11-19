@@ -1,0 +1,16 @@
+<div class="sterne-hintergrund" aria-hidden="true"></div>
+<div class="sterne-kacheln" aria-hidden="true"></div>
+<div class="sterne-ueberschrift">STERNEN<span>PFAD</span></div>
+<div id="punkte" class="sterne-punkte">Sterne: 0 / 3</div>
+<div id="hinweis" class="sterne-hinweis">Bewege den Roboter zu den Sternen.</div>
+<button id="neu" type="button" class="sterne-neu">Neu beginnen</button>
+<div data-instructions="Pfeiltasten: bewegen · R: Neustart · Neu beginnen: klicken" hidden></div>
+<template id="roboter">
+  <div class="roboter">
+    <span class="roboter-auge auge-links"></span>
+    <span class="roboter-auge auge-rechts"></span>
+    <span class="roboter-mund"></span>
+  </div>
+</template>
+<template id="stern"><div class="stern"></div></template>
+<audio id="pling" src="/game/assets/pling.wav" preload="auto"></audio>

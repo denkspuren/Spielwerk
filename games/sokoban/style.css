@@ -1,0 +1,14 @@
+#field {background:#172f40;border:2px solid #3c6879;}
+#field .sokoban-background {position:absolute;left:94px;top:24px;width:448px;height:448px;border-radius:7px;background-color:#203e4a;background-image:linear-gradient(#ffffff0e 1px,transparent 1px),linear-gradient(90deg,#ffffff0e 1px,transparent 1px);background-size:56px 56px;box-shadow:0 0 0 2px #6b96a555;}
+#field .sokoban-heading {position:absolute;top:17px;left:17px;font-size:22px;line-height:1;letter-spacing:.09em;font-weight:900;color:#f2f8ff;writing-mode:vertical-rl;}
+#field .sokoban-heading span {color:#fedb85;}
+#field .sokoban-subheading {position:absolute;top:13px;right:10px;width:74px;font-size:11px;color:#8fcbcf;line-height:1.55;}
+#field .sokoban-counter {position:absolute;left:10px;bottom:36px;color:#e4ecf5;font:700 13px ui-monospace,monospace;writing-mode:vertical-rl;}
+#field .sokoban-message {position:absolute;right:7px;bottom:27px;width:80px;font-size:11px;color:#c5d4e9;line-height:1.7;}
+#field .sk-wall {width:56px;height:56px;background:#69889a;border:4px solid #324e62;border-radius:5px;box-shadow:inset 3px 3px #9bb7c1,inset -3px -3px #3b6177;}
+#field .sk-goal {width:56px;height:56px;display:grid;place-items:center;color:#ffd167;}
+#field .goal-inner {height:35px;width:35px;border:3px dashed #e7bd67;border-radius:50%;display:grid;place-items:center;font-size:24px;color:#eac46d;background:#d8ab441e;}
+#field .sk-crate {width:50px;height:50px;margin:3px;border:3px solid #f5cf78;border-radius:8px;background:linear-gradient(145deg,#d4a94d,#a96d35);box-shadow:inset 3px 3px #f5df97,inset -3px -3px #7d4724,0 4px 10px #0006;display:grid;place-items:center;color:#fff0c9;font-size:25px;font-weight:900;}
+#field .sk-hero {width:45px;height:45px;margin:5px;border-radius:50%;border:4px solid #e5f6fa;background:radial-gradient(circle at 35% 26%,#a6f0ff,#18b6cf 70%);box-shadow:0 0 15px #29e1de8c;display:grid;place-items:center;color:#113f59;font-size:22px;}
+
+#field .sokoban-reset {position:absolute;right:12px;top:151px;padding:7px 12px;font-size:12px;color:#d6e7ee;background:#284a58;border:1px solid #6b929d;border-radius:6px;}

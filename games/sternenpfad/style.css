@@ -1,0 +1,16 @@
+/* Alle Größen sind in Pixeln festgelegt. Java kennt dieselben Zahlen. */
+#field { background:#081829; box-shadow:inset 0 0 0 2px #315779; }
+#field .sterne-hintergrund { position:absolute; inset:0; background:radial-gradient(circle at 70% 30%,#183f64 0%,#0b223b 46%,#071321 100%); }
+#field .sterne-kacheln { position:absolute; left:39px; top:79px; width:568px; height:280px; border-radius:12px; border:1px solid #5a91b24d; background-image:linear-gradient(#69b6cc19 1px,transparent 1px),linear-gradient(90deg,#69b6cc19 1px,transparent 1px); background-size:48px 48px; box-shadow:0 0 35px #0a8ea21c,inset 0 0 26px #1ea6aa10; }
+#field .sterne-ueberschrift { position:absolute; top:20px; left:39px; font-size:24px; font-weight:900; letter-spacing:.16em; color:#edf7ff; text-shadow:0 0 17px #61c7ee7c; }
+#field .sterne-ueberschrift span { color:#ffd46a; }
+#field .sterne-punkte { position:absolute; right:33px; top:26px; font:700 15px ui-monospace,monospace; color:#ffdc83; }
+#field .sterne-hinweis { position:absolute; left:42px; bottom:14px; font-size:14px; color:#c0dbef; }
+#field .sterne-neu { position:absolute; right:29px; bottom:11px; z-index:2; background:#214a67; border:1px solid #71a4c7; color:#effaff; font-size:12px; padding:7px 11px; }
+/* CREATE klont eines dieser Templates. Die Browserbasis setzt position:absolute. */
+#field .roboter { width:40px; height:40px; border:3px solid #b1e8ff; border-radius:13px; background:linear-gradient(145deg,#85dcf6 0%,#26a5d4 68%,#14719e 100%); box-shadow:inset 2px 3px #ffffff77,0 0 18px #31c6f68c; }
+#field .roboter-auge { position:absolute; top:11px; width:6px; height:8px; background:#102d49; border-radius:3px; }
+#field .auge-links { left:10px; }
+#field .auge-rechts { right:10px; }
+#field .roboter-mund { position:absolute; left:13px; bottom:7px; width:12px; height:4px; border-bottom:2px solid #10415f; border-radius:0 0 8px 8px; }
+#field .stern { width:40px; height:40px; background:url('/game/assets/stern.svg') center / contain no-repeat; filter:drop-shadow(0 0 9px #ffcf55c8); }

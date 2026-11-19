@@ -1,0 +1,4 @@
+@echo off
+cd /d "%~dp0"
+py -3 server.py games/sternenpfad/Sternenpfad.java %*
+pause

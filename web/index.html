@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{TITLE}} · Java Browser Arcade</title>
+  <link rel="stylesheet" href="/static/app.css">
+  <link rel="stylesheet" href="/game/style.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body data-width="{{WIDTH}}" data-height="{{HEIGHT}}">
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">JAVA BROWSER ARCADE · PROTOTYP</p>
+        <h1>{{TITLE}}</h1>
+        <p class="subtitle">{{MAIN}} <span aria-hidden="true">·</span> Tick-Intervall: {{TICK}} ms</p>
+      </div>
+      <div class="header-actions">
+        <span id="status" class="status" role="status">Verbinde …</span>
+        <button id="restart" type="button">↻ Java neu starten</button>
+        <button id="shutdown" class="shutdown-button" type="button" title="Spiel und lokalen Server beenden">⏻ Server beenden</button>
+      </div>
+    </header>
+
+    <section class="play-area" aria-label="Spiel">
+      <div class="stage-scroller">
+        <div id="field" tabindex="0" aria-label="Spielfeld" style="width:{{WIDTH}}px;height:{{HEIGHT}}px"></div>
+      </div>
+      <div id="error-panel" class="error-panel" hidden role="alert">
+        <strong>Compilerfehler</strong>
+        <pre id="error-text"></pre>
+      </div>
+    </section>
+    <footer class="footer">
+      <div>Steuerung: <strong id="instructions">siehe Spiel</strong></div>
+      <button id="toggle-log" type="button" aria-expanded="false">Diagnoseprotokoll anzeigen</button>
+    </footer>
+    <section id="log-panel" class="log-panel" hidden>
+      <div class="log-heading">Java stderr / Protokollwarnungen</div>
+      <pre id="log-output"></pre>
+    </section>
+    <p class="hint">Ändere eine <code>.java</code>-Datei und speichere sie: Der Server kompiliert und startet das Spiel automatisch neu. Das Spielfeld empfängt Tastatureingaben.</p>
+  </main>
+</body>
+</html>

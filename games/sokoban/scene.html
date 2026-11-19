@@ -1,0 +1,13 @@
+<div class="sokoban-background"></div>
+<div class="sokoban-heading">SOKO<span>BAN</span></div>
+<div class="sokoban-subheading">Schiebe alle Kisten auf die leuchtenden Ziele.</div>
+<div id="moves" class="sokoban-counter">Züge: 0</div>
+<button id="resetTiles" type="button" class="sokoban-reset">↻ Neu</button>
+<div id="message" class="sokoban-message">Pfeiltasten: Schieben · Z: zurück · R: neu starten</div>
+<div data-instructions="Pfeiltasten bewegen · Z zurück · R neu starten" hidden></div>
+<template id="wall"><div class="sk-wall"></div></template>
+<template id="goal"><div class="sk-goal"><div class="goal-inner">✦</div></div></template>
+<template id="crate"><div class="sk-crate"><div class="crate-inner">◆</div></div></template>
+<template id="hero"><div class="sk-hero"><span>●</span></div></template>
+<audio id="step" src="/game/assets/step.wav" preload="auto"></audio>
+<audio id="won" src="/game/assets/won.wav" preload="auto"></audio>

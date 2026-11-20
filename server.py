@@ -24,6 +24,7 @@ import tempfile
 import threading
 import time
 from urllib.parse import urlsplit
+from editor_module import EditorFiles
 
 BASE = Path(__file__).resolve().parent
 WEB = BASE / "web"
@@ -435,12 +436,15 @@ def sse_format(kind: str, message: str) -> bytes:
 
 
 def handler_factory(manager: GameManager):
+    editor = EditorFiles(manager.game_dir, WEB)
     class Handler(BaseHTTPRequestHandler):
         server_version = "JavaArcade/1.0"
         protocol_version = "HTTP/1.1"
 
         def do_GET(self) -> None:
             path = urlsplit(self.path).path
+            if editor.get(self, path):
+                return
             if path == "/events":
                 self._events()
                 return
@@ -522,6 +526,8 @@ def handler_factory(manager: GameManager):
 
         def do_POST(self) -> None:
             path = urlsplit(self.path).path
+            if editor.post(self, path):
+                return
             if path not in ("/input", "/restart", "/shutdown"):
                 self.send_error(404)
                 return

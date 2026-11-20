@@ -3,21 +3,23 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{TITLE}} · Java Browser Arcade</title>
+  <title>{{TITLE}} · Spielwerk</title>
   <link rel="stylesheet" href="/static/app.css">
   <link rel="stylesheet" href="/game/style.css">
+  <link rel="stylesheet" href="/game/spielwerk/style.css">
   <script src="/static/app.js" defer></script>
 </head>
 <body data-width="{{WIDTH}}" data-height="{{HEIGHT}}">
   <main class="app">
     <header class="topbar">
       <div>
-        <p class="eyebrow">JAVA BROWSER ARCADE · PROTOTYP</p>
+        <p class="eyebrow">SPIELWERK · PROGRAMMIEREN 1</p>
         <h1>{{TITLE}}</h1>
         <p class="subtitle">{{MAIN}} <span aria-hidden="true">·</span> Tick-Intervall: {{TICK}} ms</p>
       </div>
       <div class="header-actions">
         <span id="status" class="status" role="status">Verbinde …</span>
+        <a class="editor-link" href="/editor" target="_blank" rel="noopener">✎ Spielwerkstatt</a>
         <button id="restart" type="button">↻ Java neu starten</button>
         <button id="shutdown" class="shutdown-button" type="button" title="Spiel und lokalen Server beenden">⏻ Server beenden</button>
       </div>

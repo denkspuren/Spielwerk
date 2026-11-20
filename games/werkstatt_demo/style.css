@@ -1,0 +1,4 @@
+#field {background:#0b1730;box-shadow:inset 0 0 0 2px #345778}
+#field .demo-bg {position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,#203b68,#0b1730 75%),linear-gradient(#ffffff0c 1px,transparent 1px),linear-gradient(90deg,#ffffff0c 1px,transparent 1px);}
+#field .demo-title {position:absolute;top:15px;left:24px;font-size:18px;color:#c8ecff;letter-spacing:.15em;text-shadow:0 0 10px #44bce477}
+#field .demo-hint {position:absolute;bottom:17px;left:24px;color:#a4d0e8;font-size:13px}

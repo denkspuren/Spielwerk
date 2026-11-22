@@ -10,7 +10,11 @@ Die Demo zeigt zwei einfache Spiele in **normalem Java**, die ihre Grafiken in e
 
 ## Die Spielwerkstatt: visuelle Figuren gestalten
 
-Die **[Spielwerkstatt](docs/SPIELWERKSTATT.md)** ist ein eigenständiger Figureneditor im Browser unter **`/editor`**. Rechtecke, Ellipsen, Dreiecke, Kreisbögen, Texte und eigene Bilder lassen sich zu Figuren zusammensetzen. Größen, Schatten, Verläufe und Kollisionsflächen sind direkt sichtbar; der Editor bietet **Codevorlagen für Java und Python** an, die ausschließlich zum Kopieren dienen. Nach dem Speichern erzeugt er `spielwerk/design.json`, `spielwerk/scene.html` und `spielwerk/style.css` **ohne die ursprüngliche Spielszene oder irgendwelche Java- bzw. Python-Quelldateien zu verändern**.
+Die **[Spielwerkstatt](docs/SPIELWERKSTATT.md)** ist ein eigenständiger Figureneditor im Browser unter **`/editor`**. Rechtecke, Ellipsen, Dreiecke, Kreisbögen, Texte und eigene Bilder lassen sich zu Figuren zusammensetzen.
+
+![Screenshot SpielWerkstatt](/preview-spielwerkstatt.png)
+
+Größen, Schatten, Verläufe und Kollisionsflächen sind direkt sichtbar; der Editor bietet **Codevorlagen für Java und Python** an, die ausschließlich zum Kopieren dienen. Nach dem Speichern erzeugt er `spielwerk/design.json`, `spielwerk/scene.html` und `spielwerk/style.css` **ohne die ursprüngliche Spielszene oder irgendwelche Java- bzw. Python-Quelldateien zu verändern**.
 
 Direkter Einstieg mit einer Roboterfigur und einer zusätzlichen Formen-Demo (Dreieck und Kreisbogen):
 

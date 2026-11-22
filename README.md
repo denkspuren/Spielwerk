@@ -8,6 +8,22 @@ Die Demo zeigt zwei einfache Spiele in **normalem Java**, die ihre Grafiken in e
 
 **Hinweis**: Spielwerk basiert auf Ideen und Konzepten, die bei der Entwicklung einer Umgebung für das [Live View Programming](https://github.com/denkspuren/LiveViewProgramming) entstanden sind. Die Umsetzung und Dokumentation von Spielwerk hat ChatGPT übernommen.
 
+## Die Spielwerkstatt: visuelle Figuren gestalten
+
+Die **[Spielwerkstatt](docs/SPIELWERKSTATT.md)** ist ein eigenständiger Figureneditor im Browser unter **`/editor`**. Rechtecke, Ellipsen, Dreiecke, Kreisbögen, Texte und eigene Bilder lassen sich zu Figuren zusammensetzen.
+
+![Screenshot SpielWerkstatt](/preview-spielwerkstatt.png)
+
+Größen, Schatten, Verläufe und Kollisionsflächen sind direkt sichtbar; der Editor bietet **Codevorlagen für Java und Python** an, die ausschließlich zum Kopieren dienen. Nach dem Speichern erzeugt er `spielwerk/design.json`, `spielwerk/scene.html` und `spielwerk/style.css` **ohne die ursprüngliche Spielszene oder irgendwelche Java- bzw. Python-Quelldateien zu verändern**.
+
+Direkter Einstieg mit einer Roboterfigur und einer zusätzlichen Formen-Demo (Dreieck und Kreisbogen):
+
+```bash
+java server-java/ArcadeServer.java games/werkstatt_demo/SpielwerkDemo.java
+```
+
+Danach `http://127.0.0.1:8765/editor` öffnen. Figur bearbeiten, speichern und den Spieltab neu laden. Die Spielbefehle `CREATE`, `MOVE`, `KEYDOWN`, `TICK` usw. bleiben unverändert. Der Java-Server ist in [HTTP-Host, Spielmodul und Editormodul](docs/ARCHITEKTUR.md) getrennt; Python verwendet dieselben Editor-Endpunkte. **Kein Maven, Gradle, pip oder npm nötig.** Die Schnipselgeneratoren befinden sich als getrennte Erweiterungen in `web/editor/codegen/`. Der Server startet derzeit Java-Spielprozesse; Python als ausführbare Spielsprache ist eine mögliche spätere Erweiterung.
+
 ## Handbuch für Studierende und zwei kleine Lernspiele
 
 Im Verzeichnis **[`docs/`](docs/README.md)** liegt ein deutschsprachiges, schrittweise aufgebautes [**Studierendenhandbuch**](docs/HANDBUCH.md) für Programmieren 1. Es erklärt das Zeilenprotokoll, die Eingabeverarbeitung, den Unterschied zwischen ereignis- und zeitgesteuerten Spielen, HTML/CSS-Vorlagen, die Erstellung von SVG-/PNG-Ressourcen, Sounds sowie die wichtige Frage nach Objektgrößen und Kollisionsberechnung. Ergänzend gibt es die [Protokollreferenz](docs/PROTOKOLL.md) und [Übungsaufgaben](docs/AUFGABEN.md).
@@ -48,7 +64,7 @@ java server-java/ArcadeServer.java games/space_invaders/SpaceInvaders.java
 java server-java/ArcadeServer.java games/sokoban/Sokoban.java
 ```
 
-Passende Startskripte sind `start-space-invaders-java.sh`, `start-sokoban-java.sh` sowie die gleichnamigen `.bat`-Dateien für Windows. Wer den Server zunächst explizit kompilieren will, kann stattdessen `javac -d server-java/build server-java/ArcadeServer.java` und anschließend `java -cp server-java/build ArcadeServer games/sokoban/Sokoban.java` ausführen (das Build-Verzeichnis wird bei Bedarf automatisch von `javac` erstellt).
+Passende Startskripte sind `start-space-invaders-java.sh`, `start-sokoban-java.sh` sowie die gleichnamigen `.bat`-Dateien für Windows. Der kleine Starter kompiliert die getrennten Java-Servermodule beim Aufruf automatisch und verwendet dafür nur den eingebauten JDK-Compiler. Ein manuelles Kompilieren ist nicht nötig.
 
 ### Alternativ: Python-Server
 
@@ -160,7 +176,7 @@ Die Spielobjekte gehören vollständig der Java-Logik: Positionen und Kollisione
 
 ## Grenzen und Weiterentwicklung
 
-Dies ist ein bewusst kleiner, lauffähiger lokaler Lehrprototyp – kein Produktions-Gameserver. Beide Varianten nutzen HTTP/1.1 + SSE/POST statt WebSockets, kompilieren nur Java-Dateien auf oberster Ebene des Spielordners, stellt eine feste Pixelauflösung dar und lässt beliebigen lokalen Java-Code laufen. **Nicht öffentlich im Internet bereitstellen** oder auf einem gemeinsamen Hochschulserver mit unvertrauenswürdigen Studierendeneinsendungen ausführen. Für zentrale Ausführung wären Isolation, Authentifizierung, Limits und Prozess-Sandboxing notwendig.
+Dies ist ein bewusst kleiner, lauffähiger lokaler Lehrprototyp – kein Produktions-Gameserver. Beide Varianten nutzen HTTP/1.1 + SSE/POST statt WebSockets, kompilieren bei Java nur Quelldateien auf oberster Ebene des Spielordners und starten Python-Dateien direkt. Die Anzeige verwendet feste Pixelabmessungen. Der Spielserver führt vom Benutzer bereitgestellten Code lokal aus. **Nicht öffentlich im Internet bereitstellen** oder auf einem gemeinsamen Hochschulserver mit unvertrauenswürdigen Studierendeneinsendungen ausführen. Für zentrale Ausführung wären Isolation, Authentifizierung, Limits und Prozess-Sandboxing notwendig.
 
 Mögliche spätere Erweiterungen: `CLASS`/`ROTATE`/`SIZE` als neue Befehle, Multiplayer/Spielstände, Wiederholungen, WebSocket statt SSE/POST, allgemeine Java-Komfortbibliothek, besseres Soundmanagement und ein Aufgabenpaket für Programmieren 1.
 
@@ -172,8 +188,35 @@ python3 -m unittest discover -s tests -v
 
 Die Tests prüfen Protokollvalidierung, Zustandssynchronisation, HTTP/SSE, laufende Java-Prozesse, automatisches Neukompilieren, Ticks und den Ausschaltknopf **für beide Server**. Java JDK wird für Integrationstests vorausgesetzt.
 
-Die eigentliche Lehrschnittstelle (`CREATE`, `MOVE`, `TEXT`, `KEYDOWN`, `TICK`, usw.) ist für beide Implementierungen identisch; kein Beispielspiel muss angepasst werden. Der Java-Server ist in `server-java/ArcadeServer.java` als **eine überschaubare Datei** realisiert und verwendet `com.sun.net.httpserver.HttpServer`, `ProcessBuilder`, Threads und die üblichen JDK-I/O-Klassen. Er ist etwas ausführlicher als Python, benötigt aber ebenso keinerlei externe Bibliothek.
+Die eigentliche Lehrschnittstelle (`CREATE`, `MOVE`, `TEXT`, `KEYDOWN`, `TICK`, usw.) ist für beide Implementierungen identisch; kein Beispielspiel muss angepasst werden. Der Java-Server besitzt einen sehr kleinen, kompatiblen Quellcode-Starter `server-java/ArcadeServer.java` und die getrennten Module `SpielwerkHost.java`, `GameModule.java`, `EditorModule.java`. Er verwendet `com.sun.net.httpserver.HttpServer`, `ProcessBuilder`, Threads und die üblichen JDK-I/O-Klassen. Er ist etwas ausführlicher als Python, benötigt aber ebenso keinerlei externe Bibliothek.
 
 ## Lizenzen
 
 Die Implementierung und die SVG/Sound-Assets sind eigens für dieses Beispiel erstellt. Frei veränderbar und für die Lehre wiederverwendbar (CC0-Lizenz, siehe `LICENSE`).
+
+## Einfach starten: Java, Python oder nur die Werkstatt
+
+Es ist **keine zusätzliche Startkonfiguration** erforderlich. Der Server erkennt
+an der angegebenen Datei, was zu tun ist; `game.ini` enthält lediglich die
+optionalen Angaben zu Spielfeldgröße, Titel und Tick-Intervall.
+
+```sh
+# Java: wie bisher automatisch kompilieren und starten
+java server-java/ArcadeServer.java games/sternenpfad/Sternenpfad.java
+# Python: ohne Kompilieren starten (Python 3 muss installiert sein)
+java server-java/ArcadeServer.java games/python_demo/Hallo.py
+# Noch kein Spiel? Nur Figuren gestalten (Ordner wird bei Bedarf erstellt)
+java server-java/ArcadeServer.java meine-erste-figur
+```
+
+Die entsprechenden Aufrufe funktionieren alternativ mit `python3 server.py`.
+Bei der Ordner-Variante wird die Startseite nach `/editor` umgeleitet. Wenn
+später eine Java- oder Python-Datei entsteht, startet man den Server mit deren
+Dateinamen – an den Werkstattdateien ändert sich dadurch nichts. Die erzeugten
+Java- und Python-Codeschnipsel werden **nur angezeigt und kopiert** und niemals
+in vorhandene Quelldateien geschrieben.
+
+Im Editor erleichtern Hilfslinien, ein wählbares 1-/5-/10-Pixel-Raster,
+Zentrieren sowie Pfeiltasten das Ausrichten. Drehung und horizontale/vertikale
+Spiegelung wirken ausschließlich auf die grafischen Ebenen; die standardmäßige
+rechteckige Kollisionsfläche dreht sich **nicht automatisch mit**.

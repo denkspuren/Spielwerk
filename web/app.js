@@ -33,6 +33,9 @@
     const response = await fetch("/game/scene.html", {cache:"no-store"});
     if (!response.ok) throw new Error("scene.html fehlt (HTTP " + response.status + ")");
     field.innerHTML = await response.text();
+    // Optionaler Editor-Export: getrennt von bestehenden scene.html/Templates.
+    const extra = await fetch("/game/spielwerk/scene.html", {cache:"no-store"});
+    if (extra.ok) field.insertAdjacentHTML("beforeend", await extra.text());
     instructions.textContent = field.querySelector("[data-instructions]")?.dataset.instructions || "Pfeiltasten / Leertaste";
     field.focus({preventScroll:true});
   }

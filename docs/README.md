@@ -24,3 +24,9 @@ Anschließend **http://127.0.0.1:8765/** im Browser öffnen. Vor dem Wechsel zum
 **Voraussetzung:** Java **JDK 17 oder neuer**; `java` und `javac` müssen verfügbar sein. Beide Beispiele laufen auch mit dem alternativen Python-Server (`python3 server.py games/sternenpfad/Sternenpfad.java` bzw. `games/balllabor/Balllabor.java`). Python wird bei Verwendung des Java-Servers **nicht** benötigt.
 
 Die beiden umfangreicheren Spiele in `games/space_invaders/` und `games/sokoban/` sind **separate Anwendungen** und werden in diesem Handbuch nicht behandelt.
+
+## Grafiken gestalten: Spielwerkstatt
+
+- [Spielwerkstatt – Einstieg und Figureneditor](SPIELWERKSTATT.md): Figuren und Ebenen zeichnen, Maße festlegen, Kollisionsrechtecke und Java-Code nutzen.
+- [Architektur von Spielwerk und Spielwerkstatt](ARCHITEKTUR.md): softwaretechnische Trennung von Spiel und Editor, Dateiverzeichnis und API.
+- Beispiel: `java server-java/ArcadeServer.java games/werkstatt_demo/SpielwerkDemo.java`, dann `/editor` öffnen.

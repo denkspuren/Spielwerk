@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spielwerkstatt – Figuren gestalten</title>
+<link rel="stylesheet" href="/editor/editor.css">
+<script src="/editor/codegen/registry.js" defer></script>
+<script src="/editor/codegen/java.js" defer></script>
+<script src="/editor/codegen/python.js" defer></script>
+<script src="/editor/editor.js" defer></script>
+</head>
+<body>
+<header class="topbar">
+  <div><p class="eyebrow">SPIELWERK <span> / </span> GRAFIKWERKSTATT</p><h1>Spielwerkstatt</h1><p class="sub">Spielfiguren gestalten – unabhängig von der Programmiersprache.</p></div>
+  <div class="topactions"><a href="/" class="outline">← Zum Spiel</a><span id="save-state" role="status">Bereit</span><button id="save" class="primary">Speichern</button></div>
+</header>
+<main class="layout">
+  <aside class="panel left"><h2>Figuren</h2><p class="hint">Jede Figur ist ein <code>CREATE</code>-Template.</p><div id="templates" class="list"></div><button id="add-template" class="wide">+ Neue Figur</button><div class="separator"></div><h2>Ebenen</h2><p class="hint">Figur aus Formen, Text und Bildern zusammensetzen.</p><div id="layers" class="list"></div><div class="buttons-grid"><button data-add="rect">+ Rechteck</button><button data-add="ellipse">+ Ellipse</button><button data-add="text">+ Text</button><button data-add="image">+ Bild</button><button data-add="triangle">+ Dreieck</button><button data-add="arc">+ Kreisbogen</button></div><div class="row minor"><button id="layer-up">↑ Nach vorn</button><button id="layer-down">↓ Nach hinten</button><button id="layer-delete" class="warn">Entfernen</button></div></aside>
+  <section class="panel middle"><div class="section-header"><div><h2 id="preview-title">Vorschau</h2><p class="hint">Mit der Maus bewegen; Pfeiltasten verschieben um 1 px, Umschalt+Pfeil um 10 px.</p></div><label class="checkbox"><input id="show-guides" type="checkbox" checked> Hilfslinien</label><label class="checkbox"><input id="show-hitbox" type="checkbox" checked> Kollisionsfläche</label></div><div id="workarea"><div id="zoom-stage"><div id="artwork"></div></div></div><div class="bottom-toolbar"><label>Zoom <select id="zoom"><option value="1">100 %</option><option value="2" selected>200 %</option><option value="3">300 %</option><option value="4">400 %</option></select></label><label class="checkbox"><input id="snap-grid" type="checkbox" checked> Einrasten</label><label>Raster <select id="grid-size"><option value="1">1 px</option><option value="5" selected>5 px</option><option value="10">10 px</option></select></label><button id="center-layer" title="Ausgewählte Ebene in der Figur zentrieren">Ebene zentrieren</button><button id="test-motion">▶ Bewegung testen</button><button id="duplicate">Figur duplizieren</button><button id="delete-template" class="warn">Figur löschen</button></div><div class="help"><strong>So geht es weiter:</strong> Figur gestalten, speichern und im Spielprogramm z. B. <code>CREATE held <span id="help-template">sw-roboter</span></code> und <code>MOVE held 100 100</code> ausgeben. Bestehende Spieldateien werden nicht überschrieben.</div></section>
+  <aside class="panel right"><h2>Figur</h2><div id="template-form" class="properties"></div><div class="separator"></div><h2>Ausgewählte Ebene</h2><div id="layer-form" class="properties"></div><div class="separator"></div><h2>Kollision &amp; Codevorlagen</h2><p class="hint">Gelb gestrichelt: Kollisionsrechteck. Ursprung der Figur: links oben (0, 0).</p><label class="snippet-picker">Programmiersprache <select id="snippet-language" aria-label="Sprache für Codevorlage"></select></label><pre id="snippet-code" class="code"></pre><button id="copy-code" class="wide">Codeschnipsel kopieren</button><p class="hint snippet-disclaimer">Nur eine Kopiervorlage. Die Spielwerkstatt schreibt niemals in Ihren Java- oder Python-Quellcode.</p><details><summary>Erzeugte Dateien ansehen</summary><p class="hint">Unter <code>spielwerk/</code> gespeichert: HTML, CSS und editierbare Entwurfsdaten.</p><label>HTML<pre id="generated-html" class="code snippet"></pre></label><label>CSS<pre id="generated-css" class="code snippet"></pre></label></details></aside>
+</main>
+<div id="toast" class="toast" role="alert" hidden></div>
+</body></html>

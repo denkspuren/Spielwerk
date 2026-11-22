@@ -30,9 +30,15 @@ vm.runInContext('const fileName=()=>true; '+part+'\nthis.shapeStyle=shapeStyle;'
 const base={x:0,y:0,w:60,h:60,color:'#51AADD',color2:'#003366',gradient:false,border:0,borderColor:'#fff',radius:0,shadow:0,opacity:100,fontSize:12};
 const triangle=context.shapeStyle({...base,type:'triangle',direction:'down'});
 assert(triangle.clipPath.includes('polygon(0% 0%, 100% 0%, 50% 100%)'));
+const rotated=context.shapeStyle({...base,type:'triangle',direction:'up',rotation:90,flipX:true,flipY:false});
+assert(rotated.transform==='rotate(90deg) scale(-1, 1)', 'Drehen und Spiegeln auch in exportiertem CSS');
+const mirrored=context.shapeStyle({...base,type:'rect',rotation:-30,flipY:true});
+assert(mirrored.transform==='rotate(-30deg) scale(1, -1)');
 const arc=context.shapeStyle({...base,type:'arc',arcStart:45,arcSweep:220,arcThickness:9});
 assert(arc.background.includes('conic-gradient(from 45deg'));
 assert(arc.background.includes('220deg'));
 assert(arc.maskImage.includes('9px'));
 assert(arc.WebkitMaskImage===arc.maskImage);
-console.log('OK: Dreieck, Kreisbogen, Java/Python-Generatoren');
+const editorHtml=fs.readFileSync(path.join(root,'web/editor/index.html'),'utf8');
+for(const control of ['show-guides','snap-grid','grid-size','center-layer'])assert(editorHtml.includes(`id="${control}"`));
+console.log('OK: Grafik, Drehung, Spiegelung, Rasterhilfen, Java/Python-Generatoren');

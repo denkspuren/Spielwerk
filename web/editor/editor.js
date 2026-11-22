@@ -14,7 +14,7 @@
   const layerNames = {rect:'Rechteck',ellipse:'Ellipse',triangle:'Dreieck',arc:'Kreisbogen',text:'Text',image:'Bild'};
   const part = (type, x=8, y=8) => ({type, x,y,w:type==='text'?60:35,h:type==='text'?22:35,
     color:'#39afd5',color2:'#164e8d',gradient:false,border:0,borderColor:'#e8f7ff',radius:8,shadow:8,opacity:100,
-    text:'Hallo!',fontSize:14,image:'',direction:'up',arcStart:35,arcSweep:270,arcThickness:8});
+    text:'Hallo!',fontSize:14,image:'',direction:'up',arcStart:35,arcSweep:270,arcThickness:8,rotation:0,flipX:false,flipY:false});
   const robot = () => ({id:'sw-roboter',w:64,h:72,hit:{x:5,y:7,w:54,h:62},layers:[
     {...part('rect',3,4),w:58,h:64,color:'#53caec',color2:'#1576a4',gradient:true,border:3,borderColor:'#caeeff',radius:17,shadow:12},
     {...part('ellipse',15,23),w:9,h:12,color:'#113754',shadow:0},
@@ -42,7 +42,7 @@
       boxSizing:'border-box',background:bg,border:l.border&&shape!=='triangle'&&shape!=='arc'?`${l.border}px solid ${l.borderColor}`:'none',
       borderRadius:shape==='ellipse'||shape==='arc'?'50%':l.radius+'px',
       boxShadow:l.shadow&&shape!=='arc'?`0 0 ${l.shadow}px ${l.color}99`:'none',
-      opacity:String(l.opacity/100),fontSize:l.fontSize+'px',fontWeight:'700',color:'#ffffff',
+      opacity:String(l.opacity/100),transform:`rotate(${Number(l.rotation)||0}deg) scale(${l.flipX?-1:1}, ${l.flipY?-1:1})`,transformOrigin:'center center',fontSize:l.fontSize+'px',fontWeight:'700',color:'#ffffff',
       textAlign:'center',lineHeight:'normal',display:'flex',alignItems:'center',justifyContent:'center',whiteSpace:'nowrap',overflow:'hidden'};
     if(shape==='triangle') {
       const directions={up:'50% 0%, 100% 100%, 0% 100%',down:'0% 0%, 100% 0%, 50% 100%',
@@ -72,6 +72,9 @@
       art.appendChild(el);
     });
     if($('show-hitbox').checked){const hit=document.createElement('div');hit.className='hitbox';applyStyle(hit,{left:t.hit.x+'px',top:t.hit.y+'px',width:t.hit.w+'px',height:t.hit.h+'px'});art.appendChild(hit);}
+    if($('show-guides').checked){
+      const guides=document.createElement('div');guides.className='guides';art.appendChild(guides);
+    }
     const origin=document.createElement('div');origin.className='origin';art.appendChild(origin);
   }
   function renderLists(){
@@ -116,6 +119,9 @@
       ${l.type==='rect'||l.type==='text'?textField('radius','Eckenradius',l.radius):''}
       ${!['image','triangle','arc'].includes(l.type)?textField('border','Rahmen (px)',l.border):''}
       ${!['image','triangle','arc'].includes(l.type)?textField('borderColor','Rahmenfarbe',l.borderColor,'color'):''}
+      ${textField('rotation','Drehung (°)',l.rotation||0,'number','min="-360" max="360"')}
+      <label class="check"><input type="checkbox" data-scope="layer" data-key="flipX" ${l.flipX?'checked':''}> Horizontal spiegeln</label>
+      <label class="check"><input type="checkbox" data-scope="layer" data-key="flipY" ${l.flipY?'checked':''}> Vertikal spiegeln</label>
       ${textField('shadow','Schatten (px)',l.shadow)}${textField('opacity','Deckkraft (%)',l.opacity)}
     `;
     const button=$('upload-image'); if(button) button.onclick=()=>$('image-file').click();
@@ -161,6 +167,8 @@
       for(const k of ['x','y','w','h']) if(!Number.isInteger(t.hit[k]))throw new Error('Kollisionsgrößen müssen ganze Zahlen sein.');
       if(t.hit.w<1||t.hit.h<1)throw new Error('Das Kollisionsrechteck benötigt positive Breite und Höhe.');
       for(const l of t.layers) {
+        if(l.rotation!==undefined&&(!Number.isFinite(l.rotation)||Math.abs(l.rotation)>360))throw new Error('Drehwinkel muss zwischen -360° und 360° liegen.');
+        if(l.flipX!==undefined&&typeof l.flipX!=='boolean'||l.flipY!==undefined&&typeof l.flipY!=='boolean')throw new Error('Spiegelung muss an oder aus sein.');
         if(l.type==='image'&&l.image&&!fileName(l.image))throw new Error('Ungültiger Bilddateiname.');
         if(!['rect','ellipse','triangle','arc','text','image'].includes(l.type))throw new Error('Unbekannter Ebenentyp.');
         if(l.type==='arc'&&(!Number.isInteger(l.arcStart)||l.arcStart<0||l.arcStart>359||
@@ -198,6 +206,7 @@
       if(key==='w'||key==='h')value=max(value,scope==='hit'?1:scope==='fig'?8:1,scope==='fig'?640:700);
       else if(key==='opacity')value=max(value,0,100);
       else if(key==='fontSize')value=max(value,6,64);
+      else if(key==='rotation')value=max(value,-360,360);
       else if(key==='arcStart')value=max(value,0,359);
       else if(key==='arcSweep')value=max(value,1,359);
       else if(key==='arcThickness')value=max(value,1,Math.max(1,Math.floor(Math.min(target.w,target.h)/2)));
@@ -248,7 +257,18 @@
   }
   $('snippet-language').value='java';
   $('snippet-language').onchange=updateCode;
-  $('zoom').onchange=renderCanvas;$('show-hitbox').onchange=renderCanvas;$('save').onclick=save;
+  $('zoom').onchange=renderCanvas;$('show-hitbox').onchange=renderCanvas;$('show-guides').onchange=renderCanvas;$('save').onclick=save;
+  function snap(value){const step=$('snap-grid').checked?Number($('grid-size').value):1;return Math.round(value/step)*step;}
+  $('grid-size').onchange=()=>{if($('snap-grid').checked)flash('Rasterweite geändert.');};
+  $('center-layer').onclick=()=>{const l=currentLayer(),t=current();if(!l)return;l.x=snap((t.w-l.w)/2);l.y=snap((t.h-l.h)/2);mark();renderAll();};
+  window.addEventListener('keydown',(e)=>{
+    if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)||selected<0||
+       e.altKey||e.ctrlKey||e.metaKey||e.target.closest('input,textarea,select,button'))return;
+    const delta=e.shiftKey?10:1,l=currentLayer();
+    l.x+=e.key==='ArrowLeft'?-delta:e.key==='ArrowRight'?delta:0;
+    l.y+=e.key==='ArrowUp'?-delta:e.key==='ArrowDown'?delta:0;
+    mark();renderCanvas();updateCode();e.preventDefault();
+  });
   $('copy-code').onclick=async()=>{try{await navigator.clipboard.writeText(snippet());flash('Codeschnipsel kopiert – keine Quelldatei geändert.');}catch{flash('Codeschnipsel oben markieren und kopieren.');}};
   $('test-motion').onclick=()=>{moving=!moving;$('test-motion').textContent=moving?'■ Bewegung anhalten':'▶ Bewegung testen';
     $('zoom-stage').animate?.([{transform:'translateX(-14px)'},{transform:'translateX(14px)'},{transform:'translateX(-14px)'}],{duration:1200,iterations:moving?Infinity:1});
@@ -261,8 +281,8 @@
   window.addEventListener('pointermove',(e)=>{
     if(!drag)return;const l=currentLayer();if(!l)return;
     const zoom=Number($('zoom').value);
-    l.x=Math.round(drag.oldX+(e.clientX-drag.x)/zoom);
-    l.y=Math.round(drag.oldY+(e.clientY-drag.y)/zoom);
+    l.x=snap(drag.oldX+(e.clientX-drag.x)/zoom);
+    l.y=snap(drag.oldY+(e.clientY-drag.y)/zoom);
     mark();renderCanvas();updateCode();
   });
   window.addEventListener('pointerup',()=>{if(!drag)return;drag=null;renderAll();});

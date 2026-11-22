@@ -86,7 +86,7 @@ tick_ms = 0
 - Es gibt in v1 **keinen** Befehl, um die Größe eines Objekts abzufragen oder festzulegen. Die Abmessungen werden in `style.css` definiert und als Konstanten in Java verwendet.
 - Es gibt **keine** Kollisionserkennung im Browser. Die Spiellogik berechnet Treffer selbst.
 - Ein `TICK 33` bedeutet **nicht**, dass seit dem letzten Tick garantiert exakt 33 ms vergangen sind. Bei Überlast können Ticks übersprungen werden. Für Spiele im ersten Semester ist eine einfache feste Zeitstufe meist ausreichend.
-- Das Protokoll ist sprachunabhängig. Der mitgelieferte Server startet in dieser Version Java-Programme; andere Sprachen benötigen einen entsprechend angepassten Prozessstarter, nicht jedoch ein anderes Spielprotokoll.
+- Das Protokoll ist sprachunabhängig. Der mitgelieferte Server startet Java-Programme (`.java`) und Python-Programme (`.py`) ohne Unterschied im Protokoll; weitere Sprachen benötigen lediglich eine passende Prozessstartstrategie.
 
 ## 5. Fehlersuche
 

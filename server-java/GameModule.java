@@ -1,5 +1,6 @@
 /* Spielwerk: Spiellogik-Backend (Prozesse, stdin/stdout, Ticks, SSE-Zustand).
- * Keine Editordateien, keine Editor-HTTP-Routen. */
+ * Keine Editordateien, keine Editor-HTTP-Routen.
+ * Der Dateityp bestimmt den Starter; ein Ordner bedeutet reinen Editormodus. */
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -103,6 +104,8 @@ final class GameModule {
     static final class Manager {
         final Path mainFile;
         final Path gameDir;
+        final boolean editorOnly;
+        final boolean python;
         final SpielwerkHost.Config config;
         final Object lock = new Object();
         final Set<Client> clients = new HashSet<>();
@@ -111,16 +114,20 @@ final class GameModule {
         final AtomicBoolean force = new AtomicBoolean();
         volatile Process compiler;
         volatile Thread watcher;
-        String code = "STARTING", detail = "Java wird kompiliert …", error = "";
+        String code = "STARTING", detail = "Spiel wird gestartet …", error = "";
         Session active;
         Path buildDir;
 
         Manager(Path mainFile, SpielwerkHost.Config config) {
             this.mainFile = mainFile;
-            this.gameDir = mainFile.getParent();
+            this.editorOnly = Files.isDirectory(mainFile);
+            this.python = mainFile.toString().endsWith(".py");
+            this.gameDir = editorOnly ? mainFile : mainFile.getParent();
             this.config = config;
+            if (editorOnly) { code = "EDITOR"; detail = "Nur Spielwerkstatt"; }
         }
         void start() {
+            if (editorOnly) return;
             watcher = new Thread(this::watch, "arcade-file-watcher");
             watcher.setDaemon(true);
             watcher.start();
@@ -178,7 +185,7 @@ final class GameModule {
         void finished(Session owner, int exit) {
             synchronized (lock) {
                 if (active == owner)
-                    updateStatus("STOPPED", "Java-Prozess beendet (Exit-Code " + exit + ").");
+                    updateStatus("STOPPED", "Spielprozess beendet (Exit-Code " + exit + ").");
             }
         }
         boolean input(String line) {
@@ -188,12 +195,12 @@ final class GameModule {
             if (current != null) current.put(line);
             return true;
         }
-        void restart() { force.set(true); }
+        void restart() { if (!editorOnly) force.set(true); }
 
         List<String> signature() {
             try (Stream<Path> entries = Files.list(gameDir)) {
                 List<String> sig = new ArrayList<>();
-                for (Path p : entries.filter(f -> f.getFileName().toString().endsWith(".java"))
+                for (Path p : entries.filter(f -> f.getFileName().toString().endsWith(python ? ".py" : ".java"))
                         .sorted().toList()) {
                     sig.add(p + ":" + Files.getLastModifiedTime(p).to(TimeUnit.NANOSECONDS) + ":" + Files.size(p));
                 }
@@ -234,10 +241,11 @@ final class GameModule {
                 error = "";
                 broadcast("reset", "");
                 broadcast("compile", "");
-                updateStatus("STARTING", "Java wird kompiliert …");
+                updateStatus("STARTING", "Spiel wird gestartet …");
             }
             if (prior != null) prior.stop();
             if (stopping.get()) return;
+            if (python) { launchPython(); return; }
             List<Path> files;
             try (Stream<Path> stream = Files.list(gameDir)) {
                 files = stream.filter(p -> p.getFileName().toString().endsWith(".java"))
@@ -311,6 +319,31 @@ final class GameModule {
                 System.out.println("[server] Started " + mainFile.getFileName() +
                         " (PID " + game.pid() + ", tick " + config.tickMs() + " ms)");
             } catch (IOException e) { compileError("Java konnte nicht gestartet werden: " + e); }
+        }
+        void launchPython() {
+            if (!Files.isRegularFile(mainFile)) {
+                compileError("Python-Hauptdatei nicht gefunden: " + mainFile.getFileName()); return;
+            }
+            IOException launchError = null;
+            // Die CLI bleibt identisch: .py statt .java; kein Build-Skript nötig.
+            List<String> interpreters = System.getProperty("os.name").toLowerCase().contains("win")
+                    ? List.of("python", "python3") : List.of("python3", "python");
+            for (String executable : interpreters) {
+                if (stopping.get()) return;
+                try {
+                    Process process = new ProcessBuilder(executable, "-u", mainFile.getFileName().toString())
+                            .directory(gameDir.toFile()).start();
+                    Session session = new Session(this, process);
+                    synchronized (lock) {
+                        active = session;
+                        updateStatus("RUNNING", "Spiel läuft");
+                    }
+                    session.launch(config.tickMs());
+                    System.out.println("[server] Python: " + mainFile.getFileName() + " (PID " + process.pid() + ")");
+                    return;
+                } catch (IOException ex) { launchError = ex; }
+            }
+            compileError("Python konnte nicht gestartet werden (Python 3 im PATH erforderlich): " + launchError);
         }
     }
 

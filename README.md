@@ -166,7 +166,7 @@ Die Spielobjekte gehören vollständig der Java-Logik: Positionen und Kollisione
 
 ## Grenzen und Weiterentwicklung
 
-Dies ist ein bewusst kleiner, lauffähiger lokaler Lehrprototyp – kein Produktions-Gameserver. Beide Varianten nutzen HTTP/1.1 + SSE/POST statt WebSockets, kompilieren nur Java-Dateien auf oberster Ebene des Spielordners, stellt eine feste Pixelauflösung dar und lässt beliebigen lokalen Java-Code laufen. **Nicht öffentlich im Internet bereitstellen** oder auf einem gemeinsamen Hochschulserver mit unvertrauenswürdigen Studierendeneinsendungen ausführen. Für zentrale Ausführung wären Isolation, Authentifizierung, Limits und Prozess-Sandboxing notwendig.
+Dies ist ein bewusst kleiner, lauffähiger lokaler Lehrprototyp – kein Produktions-Gameserver. Beide Varianten nutzen HTTP/1.1 + SSE/POST statt WebSockets, kompilieren bei Java nur Quelldateien auf oberster Ebene des Spielordners und starten Python-Dateien direkt. Die Anzeige verwendet feste Pixelabmessungen. Der Spielserver führt vom Benutzer bereitgestellten Code lokal aus. **Nicht öffentlich im Internet bereitstellen** oder auf einem gemeinsamen Hochschulserver mit unvertrauenswürdigen Studierendeneinsendungen ausführen. Für zentrale Ausführung wären Isolation, Authentifizierung, Limits und Prozess-Sandboxing notwendig.
 
 Mögliche spätere Erweiterungen: `CLASS`/`ROTATE`/`SIZE` als neue Befehle, Multiplayer/Spielstände, Wiederholungen, WebSocket statt SSE/POST, allgemeine Java-Komfortbibliothek, besseres Soundmanagement und ein Aufgabenpaket für Programmieren 1.
 
@@ -183,3 +183,30 @@ Die eigentliche Lehrschnittstelle (`CREATE`, `MOVE`, `TEXT`, `KEYDOWN`, `TICK`, 
 ## Lizenzen
 
 Die Implementierung und die SVG/Sound-Assets sind eigens für dieses Beispiel erstellt. Frei veränderbar und für die Lehre wiederverwendbar (MIT-Lizenz, siehe `LICENSE`).
+
+## Einfach starten: Java, Python oder nur die Werkstatt
+
+Es ist **keine zusätzliche Startkonfiguration** erforderlich. Der Server erkennt
+an der angegebenen Datei, was zu tun ist; `game.ini` enthält lediglich die
+optionalen Angaben zu Spielfeldgröße, Titel und Tick-Intervall.
+
+```sh
+# Java: wie bisher automatisch kompilieren und starten
+java server-java/ArcadeServer.java games/sternenpfad/Sternenpfad.java
+# Python: ohne Kompilieren starten (Python 3 muss installiert sein)
+java server-java/ArcadeServer.java games/python_demo/Hallo.py
+# Noch kein Spiel? Nur Figuren gestalten (Ordner wird bei Bedarf erstellt)
+java server-java/ArcadeServer.java meine-erste-figur
+```
+
+Die entsprechenden Aufrufe funktionieren alternativ mit `python3 server.py`.
+Bei der Ordner-Variante wird die Startseite nach `/editor` umgeleitet. Wenn
+später eine Java- oder Python-Datei entsteht, startet man den Server mit deren
+Dateinamen – an den Werkstattdateien ändert sich dadurch nichts. Die erzeugten
+Java- und Python-Codeschnipsel werden **nur angezeigt und kopiert** und niemals
+in vorhandene Quelldateien geschrieben.
+
+Im Editor erleichtern Hilfslinien, ein wählbares 1-/5-/10-Pixel-Raster,
+Zentrieren sowie Pfeiltasten das Ausrichten. Drehung und horizontale/vertikale
+Spiegelung wirken ausschließlich auf die grafischen Ebenen; die standardmäßige
+rechteckige Kollisionsfläche dreht sich **nicht automatisch mit**.

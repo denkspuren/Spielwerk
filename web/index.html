@@ -20,7 +20,7 @@
       <div class="header-actions">
         <span id="status" class="status" role="status">Verbinde …</span>
         <a class="editor-link" href="/editor" target="_blank" rel="noopener">✎ Spielwerkstatt</a>
-        <button id="restart" type="button">↻ Java neu starten</button>
+        <button id="restart" type="button">↻ Spiel neu starten</button>
         <button id="shutdown" class="shutdown-button" type="button" title="Spiel und lokalen Server beenden">⏻ Server beenden</button>
       </div>
     </header>
@@ -39,10 +39,10 @@
       <button id="toggle-log" type="button" aria-expanded="false">Diagnoseprotokoll anzeigen</button>
     </footer>
     <section id="log-panel" class="log-panel" hidden>
-      <div class="log-heading">Java stderr / Protokollwarnungen</div>
+      <div class="log-heading">Spiel stderr / Protokollwarnungen</div>
       <pre id="log-output"></pre>
     </section>
-    <p class="hint">Ändere eine <code>.java</code>-Datei und speichere sie: Der Server kompiliert und startet das Spiel automatisch neu. Das Spielfeld empfängt Tastatureingaben.</p>
+    <p class="hint">Ändere eine <code>{{EXTENSION}}</code>-Datei und speichere sie: Der Server startet das Spiel automatisch neu (bei Java nach dem Kompilieren). Das Spielfeld empfängt Tastatureingaben.</p>
   </main>
 </body>
 </html>

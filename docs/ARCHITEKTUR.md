@@ -28,7 +28,7 @@ Die **Spielausführung** und das **Bearbeiten grafischer Ressourcen** sind zwei 
 
 - `server-java/ArcadeServer.java` ist ein kleiner **Starter**. Da die direkte Java-Quellcodeausführung (`java Datei.java`) nicht automatisch weitere `.java`-Dateien kompiliert, kompiliert er die Servermodule beim Start mit dem JDK-Compiler in ein temporäres Verzeichnis und startet `SpielwerkHost` als eigenen Java-Prozess. Die bekannte Startzeile funktioniert weiterhin, ohne Gradle oder Maven.
 - `server-java/SpielwerkHost.java` ist der **HTTP-Einstiegspunkt**. Er leitet `/editor*` und `/game/spielwerk/*` an das Editormodul weiter; Spiel-Ereignisse, Status und Standardressourcen gehören dem Spielmodul. Er enthält keine Gestaltungsvorgaben oder Editor-Dateiverarbeitung.
-- `server-java/GameModule.java` kapselt **Spielzustand, Java-Prozessstart, Ticks, stdin/stdout und das Abonnement der Spielereignisse**. Es kennt die Editor-API nicht.
+- `server-java/GameModule.java` kapselt **Spielzustand, Java-/Python-Prozessstart, Ticks, stdin/stdout und das Abonnement der Spielereignisse**. Es kennt die Editor-API nicht.
 - `server-java/EditorModule.java` kapselt **Editor-HTTP-Endpunkte, Entwurfsspeicherung, generierte Ressourcen und Bild-Upload**. Es kennt weder `GameModule` noch Java-Prozesse.
 - `web/app.js`, `web/app.css`, `web/index.html` sind die reine **Spielansicht**. Sie laden die optionalen Editor-Templates als zusätzliche Ressourcen.
 - `web/editor/*` ist die unabhängige **Editoroberfläche**, die aus ihrem eigenen Entwurfsmodell HTML und CSS erzeugt.
@@ -88,4 +88,10 @@ spielwerk/design.json  (sprachneutrale Figur + Kollisionsrechteck)
 
 Die Werkstatt **schreibt niemals in `.java`- oder `.py`-Dateien**. Beim Speichern werden wie bisher nur `spielwerk/design.json`, `spielwerk/scene.html` und `spielwerk/style.css` aktualisiert, gegebenenfalls zusätzlich vom Benutzer hochgeladene Bilddateien. Der Java- und der Python-Server liefern unter `/editor/codegen/<sprache>.js` lediglich lokal mitgelieferte, lesbare Skripte aus. Diese besitzen keine eigene HTTP-Schreibschnittstelle.
 
-Sprachneutralität umfasst zwei unabhängig erweiterbare Bereiche: **(a)** grafische Ressourcen und Schnipselvorschläge in der Werkstatt, **(b)** Start und Überwachung der eigentlichen Spielprozesse. Zurzeit startet das Spielmodul Java-Programme. Ein Python-Spielprozess wäre künftig über einen separaten Startadapter im **GameModule** zu ergänzen. Das vorhandene `stdin`/`stdout`-Protokoll müsste dazu nicht verändert werden.
+Sprachneutralität umfasst zwei unabhängig erweiterbare Bereiche: **(a)** grafische Ressourcen und Schnipselvorschläge in der Werkstatt, **(b)** Start und Überwachung der eigentlichen Spielprozesse. Das Spielmodul startet Java-Hauptdateien mit automatischer Kompilierung und Python-Hauptdateien direkt mit Python 3 (`-u` für ungepufferte Ausgaben). Dazu reicht die Dateiendung; eine zusätzliche Startdatei wird nicht benötigt. Ein Verzeichnis ohne Hauptdatei startet ausschließlich den Editor. Das vorhandene `stdin`/`stdout`-Protokoll ist für beide Sprachen identisch.
+
+## Einfacher Start ohne Projekt- oder Buildkonfiguration
+
+Der Dateiname entscheidet über die Aktion: `.java` bedeutet automatisch `javac` und `java`, `.py` bedeutet Python 3, ein Ordner bedeutet reine Werkstatt. Ein noch nicht vorhandener Ordner wird angelegt, solange sein Name keine Dateiendung hat. `game.ini` kann unabhängig davon Titel, Größe und `tick_ms` angeben, enthält aber **keine Befehle zum Starten oder Bauen**. Eine darüber hinausgehende Startstrategie ist zunächst bewusst nicht vorgesehen.
+
+Drehung, Spiegelung, Rasterhilfen und Kollisionsvorschau befinden sich ausschließlich in `web/editor/*`. Sie verändern weder das Textprotokoll noch den Spielstarter. Transformierte Ebenen behalten ein unverändertes, achsenparalleles Kollisionsrechteck, dessen Größe im Entwurfsmodell explizit eingestellt wird.

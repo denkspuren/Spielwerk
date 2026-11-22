@@ -160,7 +160,7 @@ Diese Schnipsel sind **ausdrücklich nur Kopiervorlagen**. Die Sprachwahl beeinf
 
 Die Codeschnipsel stammen aus demselben sprachneutralen `spielwerk/design.json`. Beispielsweise wird die Kollisionsbreite `54` in Java zu `static final int ROBOTER_KOLLISION_BREITE = 54;` und in Python zu `ROBOTER_KOLLISION_BREITE = 54`.
 
-Die **Spielausführung selbst** verwendet bisher einen vom Server gestarteten **Java-Prozess**. Dass Python-Codeschnipsel vorliegen, bedeutet noch nicht, dass der vorhandene Spielstarter Python-Dateien automatisch starten kann. Das wäre eine separate Erweiterung der *Spielausführung*, nicht der Werkstatt. Das Textprotokoll `CREATE`, `MOVE`, `KEYDOWN` usw. ist dafür bereits sprachneutral.
+Die **Spielausführung** unterstützt Java (`.java`: automatisch kompilieren und starten) und Python (`.py`: direkt mit Python 3 starten). Die Wahl der Programmiersprache ist **keine Einstellung in der Werkstatt**: Sie ergibt sich nur aus der übergebenen Hauptdatei. Das Textprotokoll `CREATE`, `MOVE`, `KEYDOWN` usw. ist für beide Sprachen identisch.
 
 ## 11. Eine zusätzliche Programmiersprache ergänzen
 
@@ -180,3 +180,23 @@ window.SpielwerkCodegen.register({
 Die neue JavaScript-Datei unter `web/editor/codegen/` ablegen und **vor `editor.js`** als `<script defer src="/editor/codegen/beispiel.js"></script>` in `web/editor/index.html` einbinden. Beide lokalen Server liefern die einzelnen Codegeneratordateien über `/editor/codegen/` aus, ohne das Spielmodul zu berühren. Das Sprachmodul bekommt von der Registrierungsfunktion nur eine Kopie der gewählten Figur aus dem JSON-Modell. Die vorgesehenen Generatoren verwenden diese ausschließlich lesend und liefern Text zurück. **Hinweis für Erweiternde:** Wie andere Seitenskripte werden solche Generatoren im Browserkontext ausgeführt. Es dürfen daher nur vertrauenswürdige Skripte eingebunden werden; die Registrierung ist keine Sicherheits-Sandbox.
 
 Die Kopiervorlagen sind Beispiele und keine vollständigen Spielprogramme. Die weitere Ereignisverarbeitung (blockierendes Lesen von `stdin`, Reaktion auf `KEYDOWN` und gegebenenfalls `TICK`) beschreiben das [Handbuch](HANDBUCH.md) und die [Protokollreferenz](PROTOKOLL.md).
+
+## Drehen, Spiegeln und Positionieren
+
+Wählen Sie eine Ebene aus. Unter **Drehung** können Sie Winkel in Grad eingeben,
+mit **Horizontal spiegeln** und **Vertikal spiegeln** lässt sich die Ebene
+umkehren. Drehung und Spiegelung ändern nicht das Koordinatensystem der Figur;
+`MOVE` bewegt weiterhin deren linke obere Ecke. Die Kollisionsfläche bleibt
+ein achsenparalleles Rechteck und muss gegebenenfalls manuell angepasst werden.
+
+Zur genauen Platzierung dienen **Hilfslinien** (Mittelachsen), **Einrasten** in ein
+Raster von 1, 5 oder 10 Pixeln, **Ebene zentrieren** und die Pfeiltasten:
+Ein Pfeiltastendruck verschiebt die ausgewählte Ebene um ein Pixel; mit
+Umschalttaste sind es zehn Pixel. Die Eingaben funktionieren, wenn gerade
+kein Text- oder Zahlenfeld bearbeitet wird.
+
+Die Werkstatt kann auch ganz ohne Spielprogramm gestartet werden: Geben Sie beim
+Serverstart ein Verzeichnis statt einer `.java`- oder `.py`-Datei an. Wird der
+Ordner neu angelegt, öffnet sich eine leere Werkstatt mit einer ersten Figur.
+Beim späteren Start mit einer Quelldatei im selben Ordner bleiben die Entwürfe
+erhalten. Es gibt keine zusätzliche Projektdatei für Startbefehle.

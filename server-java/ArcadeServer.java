@@ -1,5 +1,5 @@
 /* Spielwerk: Java-Quellcode-Starter (JDK 17+, ohne Build-Tool).
- * java server-java/ArcadeServer.java games/<spiel>/<Hauptdatei>.java
+ * java server-java/ArcadeServer.java <Spiel.java | Spiel.py | Projektordner>
  * Kompiliert die getrennten Server-Module in ein temporäres Verzeichnis.
  */
 import java.io.*;

@@ -2,7 +2,7 @@
  * Java Browser Arcade – lokaler HTTP/SSE-Server, nur JDK 17+.
  * Start: java server-java/ArcadeServer.java games/sokoban/Sokoban.java
  *
- * Studentenprogramme laufen als eigene Java-Prozesse. stdin/stdout enthalten
+ * Studentenprogramme laufen als eigene Java-/Python-Prozesse. stdin/stdout enthalten
  * ausschließlich das zeilenbasierte Spielprotokoll; stderr ist für Debugging.
  */
 import com.sun.net.httpserver.HttpExchange;
@@ -78,7 +78,7 @@ public class SpielwerkHost {
     private SpielwerkHost(Path mainFile, Config config, int port) throws IOException {
         this.port = port;
         manager = new GameModule.Manager(mainFile, config);
-        editor = new EditorModule(mainFile.getParent(), WEB.resolve("editor"), port);
+        editor = new EditorModule(manager.gameDir, WEB.resolve("editor"), port);
         server = HttpServer.create(new InetSocketAddress("127.0.0.1", port), 0);
         server.createContext("/", this::handle);
         server.setExecutor(requests);
@@ -87,12 +87,15 @@ public class SpielwerkHost {
     public static void main(String[] args) throws Exception {
         if (args.length < 1 || args.length > 3 ||
                 (args.length == 3 && !args[1].equals("--port"))) {
-            System.err.println("Aufruf: java server-java/ArcadeServer.java <Hauptdatei.java> [--port 8765]");
+            System.err.println("Aufruf: java server-java/ArcadeServer.java <Spiel.java | Spiel.py | Projektordner> [--port 8765]");
             System.exit(2);
         }
         Path mainFile = Path.of(args[0]).toAbsolutePath().normalize();
-        if (!Files.isRegularFile(mainFile) || !mainFile.toString().endsWith(".java")) {
-            System.err.println("Java-Hauptdatei nicht gefunden: " + mainFile);
+        if (!Files.exists(mainFile) && !mainFile.getFileName().toString().contains("."))
+            Files.createDirectories(mainFile);
+        if (!(Files.isDirectory(mainFile) || (Files.isRegularFile(mainFile) &&
+                (mainFile.toString().endsWith(".java") || mainFile.toString().endsWith(".py"))))) {
+            System.err.println("Erwartet: .java, .py oder Projektordner: " + mainFile);
             System.exit(2);
         }
         int port = args.length == 3 ? Integer.parseInt(args[2]) : 8765;
@@ -101,13 +104,13 @@ public class SpielwerkHost {
             System.err.println("Bitte im Projektverzeichnis starten (web/index.html fehlt).");
             System.exit(2);
         }
-        Config config = Config.load(mainFile.getParent());
+        Config config = Config.load(Files.isDirectory(mainFile) ? mainFile : mainFile.getParent());
         SpielwerkHost app = new SpielwerkHost(mainFile, config, port);
         Runtime.getRuntime().addShutdownHook(new Thread(app::close, "arcade-shutdown-hook"));
         app.manager.start();
         app.server.start();
         System.out.println("[server] " + config.title() + ": http://127.0.0.1:" + port);
-        System.out.println("[server] Java-Hauptdatei: " + mainFile);
+        System.out.println("[server] " + (Files.isDirectory(mainFile) ? "Spielwerkstatt-Verzeichnis" : "Hauptdatei") + ": " + mainFile);
         System.out.println("[server] Browser-Button 'Server beenden' oder Strg+C zum Beenden.");
     }
 
@@ -126,7 +129,12 @@ public class SpielwerkHost {
             String method = ex.getRequestMethod();
             if (method.equals("GET")) {
                 switch (path) {
-                    case "/" -> send(ex, 200, page(), "text/html; charset=utf-8");
+                    case "/" -> {
+                        if (manager.editorOnly) {
+                            ex.getResponseHeaders().set("Location", "/editor");
+                            ex.sendResponseHeaders(302, -1);
+                        } else send(ex, 200, page(), "text/html; charset=utf-8");
+                    }
                     case "/health" -> send(ex, 200, "OK\n", "text/plain; charset=utf-8");
                     case "/events" -> events(ex);
                     case "/game/scene.html" -> file(ex, manager.gameDir, "scene.html");
@@ -161,7 +169,9 @@ public class SpielwerkHost {
                 .replace("{{WIDTH}}", Integer.toString(cfg.width()))
                 .replace("{{HEIGHT}}", Integer.toString(cfg.height()))
                 .replace("{{TICK}}", Integer.toString(cfg.tickMs()))
-                .replace("{{MAIN}}", escapeHtml(manager.mainFile.getFileName().toString()));
+                .replace("{{MAIN}}", escapeHtml(manager.mainFile.getFileName().toString()))
+                .replace("{{LANGUAGE}}", manager.python ? "Python" : "Java")
+                .replace("{{EXTENSION}}", manager.python ? ".py" : ".java");
     }
 
     private static String escapeHtml(String s) {

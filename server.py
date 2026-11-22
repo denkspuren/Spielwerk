@@ -255,12 +255,14 @@ class GameSession:
 class GameManager:
     def __init__(self, main_file: Path, config: GameConfig):
         self.main_file = main_file.resolve()
-        self.game_dir = self.main_file.parent
+        self.editor_only = self.main_file.is_dir()
+        self.game_dir = self.main_file if self.editor_only else self.main_file.parent
+        self.language = "python" if self.main_file.suffix == ".py" else "java"
         self.config = config
         self.lock = threading.RLock()
         self.clients: set[Client] = set()
         self.state = SceneState()
-        self.status = ("STARTING", "Java wird kompiliert …")
+        self.status = (("EDITOR", "Nur Spielwerkstatt") if self.editor_only else ("STARTING", "Programm wird gestartet …"))
         self.error = ""
         self.active: GameSession | None = None
         self.stop_event = threading.Event()
@@ -269,6 +271,8 @@ class GameManager:
         self.build_dir: Path | None = None
 
     def start(self) -> None:
+        if self.editor_only:
+            return
         self.thread = threading.Thread(target=self._watch, name="file-watcher", daemon=True)
         self.thread.start()
 
@@ -314,7 +318,7 @@ class GameManager:
 
     def log(self, text: str) -> None:
         self._broadcast("log", text[:3000])
-        print(f"[java] {text[:500]}", file=sys.stderr)
+        print(f"[game] {text[:500]}", file=sys.stderr)
 
     def command(self, session: GameSession, parsed: tuple[str, ...]) -> None:
         with self.lock:
@@ -327,7 +331,7 @@ class GameManager:
         with self.lock:
             if self.active is not session:
                 return
-            self.status = ("STOPPED", f"Java-Prozess beendet (Exit-Code {exit_code}).")
+            self.status = ("STOPPED", f"Spielprozess beendet (Exit-Code {exit_code}).")
             self._broadcast("status", "\t".join(self.status))
 
     def input(self, line: str) -> bool:
@@ -340,12 +344,13 @@ class GameManager:
         return True
 
     def restart(self) -> None:
-        self.force_event.set()
+        if not self.editor_only:
+            self.force_event.set()
 
     def _files_signature(self) -> tuple:
         # Only Java changes require a recompile. HTML/CSS are fetched on browser reload.
         try:
-            paths = sorted(self.game_dir.glob("*.java"))
+            paths = sorted(self.game_dir.glob("*.py" if self.language == "python" else "*.java"))
             return tuple((str(p), p.stat().st_mtime_ns, p.stat().st_size) for p in paths)
         except FileNotFoundError:
             return ()
@@ -371,46 +376,54 @@ class GameManager:
             self.active = None
             self.state.clear()
             self.error = ""
-            self.status = ("STARTING", "Java wird kompiliert …")
+            self.status = ("STARTING", "Programm wird gestartet …")
             self._broadcast("reset", "")
             self._broadcast("compile", "")
             self._broadcast("status", "\t".join(self.status))
         if old:
             old.stop()
-        sources = sorted(self.game_dir.glob("*.java"))
-        if not sources or not self.main_file.exists():
-            self._compile_error("Keine Java-Quelldateien bzw. Hauptdatei nicht gefunden.")
+        if not self.main_file.exists():
+            self._compile_error(f"Hauptdatei nicht gefunden: {self.main_file.name}")
             return
-        build = Path(tempfile.mkdtemp(prefix="arcade-classes-"))
-        try:
-            result = subprocess.run(
-                ["javac", "-encoding", "UTF-8", "-d", str(build), *map(str, sources)],
-                cwd=self.game_dir, capture_output=True, text=True, encoding="utf-8",
-                errors="replace", timeout=30, check=False,
-            )
-        except (OSError, subprocess.TimeoutExpired) as e:
-            shutil.rmtree(build, ignore_errors=True)
-            self._compile_error(f"javac konnte nicht ausgeführt werden: {e}")
-            return
-        if result.returncode != 0:
-            shutil.rmtree(build, ignore_errors=True)
-            self._compile_error((result.stdout + "\n" + result.stderr).strip())
-            return
+        if self.language == "python":
+            command = [sys.executable, "-u", self.main_file.name]
+        else:
+            sources = sorted(self.game_dir.glob("*.java"))
+            if not sources:
+                self._compile_error("Keine Java-Quelldateien gefunden.")
+                return
+            build = Path(tempfile.mkdtemp(prefix="arcade-classes-"))
+            try:
+                result = subprocess.run(
+                    ["javac", "-encoding", "UTF-8", "-d", str(build), *map(str, sources)],
+                    cwd=self.game_dir, capture_output=True, text=True, encoding="utf-8",
+                    errors="replace", timeout=30, check=False,
+                )
+            except (OSError, subprocess.TimeoutExpired) as e:
+                shutil.rmtree(build, ignore_errors=True)
+                self._compile_error(f"javac konnte nicht ausgeführt werden: {e}")
+                return
+            if result.returncode != 0:
+                shutil.rmtree(build, ignore_errors=True)
+                self._compile_error((result.stdout + "\n" + result.stderr).strip())
+                return
+            if self.stop_event.is_set():
+                shutil.rmtree(build, ignore_errors=True)
+                return
+            if self.build_dir:
+                shutil.rmtree(self.build_dir, ignore_errors=True)
+            self.build_dir = build
+            command = ["java", "-cp", str(build), self.main_file.stem]
         if self.stop_event.is_set():
-            shutil.rmtree(build, ignore_errors=True)
             return
-        if self.build_dir:
-            shutil.rmtree(self.build_dir, ignore_errors=True)
-        self.build_dir = build
         try:
             process = subprocess.Popen(
-                ["java", "-cp", str(build), self.main_file.stem],
-                cwd=self.game_dir, stdin=subprocess.PIPE,
+                command, cwd=self.game_dir, stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 bufsize=1, text=True, encoding="utf-8", errors="replace",
             )
         except OSError as e:
-            self._compile_error(f"Java konnte nicht gestartet werden: {e}")
+            self._compile_error(f"Spiel konnte nicht gestartet werden: {e}")
             return
         session = GameSession(self, process)
         with self.lock:
@@ -451,6 +464,12 @@ def handler_factory(manager: GameManager):
             if path == "/health":
                 self._send(b"OK\n", "text/plain; charset=utf-8")
                 return
+            if path == "/" and manager.editor_only:
+                self.send_response(302)
+                self.send_header("Location", "/editor")
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+                return
             if path == "/":
                 template = (WEB / "index.html").read_text(encoding="utf-8")
                 for key, value in {
@@ -459,6 +478,8 @@ def handler_factory(manager: GameManager):
                     "HEIGHT": str(manager.config.height),
                     "TICK": str(manager.config.tick_ms),
                     "MAIN": html.escape(manager.main_file.name, quote=True),
+                    "LANGUAGE": "Python" if manager.language == "python" else "Java",
+                    "EXTENSION": ".py" if manager.language == "python" else ".java",
                 }.items():
                     template = template.replace("{{" + key + "}}", value)
                 self._send(template.encode("utf-8"), "text/html; charset=utf-8")
@@ -583,22 +604,24 @@ def handler_factory(manager: GameManager):
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Java-Browser-Arcade (ohne pip-Pakete)")
-    parser.add_argument("main_file", type=Path, help="Hauptdatei des Spiels, z.B. games/sokoban/Sokoban.java")
+    parser = argparse.ArgumentParser(description="Spielwerk (ohne zusätzliche Python-Pakete)")
+    parser.add_argument("main_file", type=Path, help=".java- oder .py-Hauptdatei; ein Ordner startet nur die Werkstatt")
     parser.add_argument("--port", type=int, default=8765)
     args = parser.parse_args()
     main_file = args.main_file.resolve()
-    if not main_file.is_file() or main_file.suffix != ".java":
-        parser.error(f"Java-Hauptdatei nicht gefunden: {main_file}")
-    if shutil.which("java") is None or shutil.which("javac") is None:
+    if not main_file.exists() and not main_file.suffix:
+        main_file.mkdir(parents=True, exist_ok=True)
+    if not (main_file.is_dir() or (main_file.is_file() and main_file.suffix in (".java", ".py"))):
+        parser.error(f"Erwartet: .java, .py oder Projektordner: {main_file}")
+    if main_file.suffix == ".java" and (shutil.which("java") is None or shutil.which("javac") is None):
         parser.error("Java JDK nicht gefunden. 'java' und 'javac' müssen im PATH liegen.")
-    config = load_config(main_file.parent)
+    config = load_config(main_file if main_file.is_dir() else main_file.parent)
     manager = GameManager(main_file, config)
     server = ThreadingHTTPServer(("127.0.0.1", args.port), handler_factory(manager))
     server.daemon_threads = True
     manager.start()
     print(f"[server] {config.title}: http://127.0.0.1:{args.port}")
-    print(f"[server] Java-Hauptdatei: {main_file}")
+    print(f"[server] {'Spielwerkstatt-Verzeichnis' if main_file.is_dir() else 'Hauptdatei'}: {main_file}")
     print("[server] Strg+C zum Beenden.")
     try:
         server.serve_forever(poll_interval=0.3)

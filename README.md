@@ -1,6 +1,12 @@
-# Spielwerk – aus Code wird Spiel
+# Spielwerk: Wenig Code. Viel Spiel.
 
-Vier Spiele und eine Spielwerkstatt-Demo in **normalem Java**, die ihre Grafiken in einem Browser ausgeben. **Zwei austauschbare Server** sind enthalten: ein Server in reinem **Java (JDK 17+)** und einer in der **Python-Standardbibliothek**. Beide verwenden dieselbe Browseroberfläche und dasselbe sprachunabhängige Zeilenprotokoll. **Kein pip, npm, Node, Grafikframework oder zusätzliche Java-Bibliothek** erforderlich. Das **Spielprotokoll** benötigt kein JSON; nur die interne Entwurfsdatei des Editors verwendet JSON.
+> Das Programmieren macht oft mehr Spaß und ist motivierender, wenn man Spiele programmiert. Spielwerk macht es Ihnen sehr leicht, Ihr erstes Spiel zu entwerfen und zu realisieren. Viel Spaß! 
+
+Die Demo zeigt zwei einfache Spiele in **normalem Java**, die ihre Grafiken in einem Browser ausgeben. **Zwei austauschbare Server** sind enthalten: ein Server in reinem **Java (JDK 17+)** und einer in der **Python-Standardbibliothek**. Beide verwenden dieselbe Browseroberfläche und dasselbe sprachunabhängige Zeilenprotokoll. Es ist kein pip, npm, Node, Framework, JSON oder eine zusätzliche Java-Bibliothek erforderlich.
+
+![Screenshot Space Invaders](/Screenshot_SpaceInvaders.png)
+
+**Hinweis**: Spielwerk basiert auf Ideen und Konzepten, die bei der Entwicklung einer Umgebung für das [Live View Programming](https://github.com/denkspuren/LiveViewProgramming) entstanden sind. Die Umsetzung und Dokumentation von Spielwerk hat ChatGPT übernommen.
 
 ## Die Spielwerkstatt: visuelle Figuren gestalten
 
@@ -182,7 +188,7 @@ Die eigentliche Lehrschnittstelle (`CREATE`, `MOVE`, `TEXT`, `KEYDOWN`, `TICK`, 
 
 ## Lizenzen
 
-Die Implementierung und die SVG/Sound-Assets sind eigens für dieses Beispiel erstellt. Frei veränderbar und für die Lehre wiederverwendbar (MIT-Lizenz, siehe `LICENSE`).
+Die Implementierung und die SVG/Sound-Assets sind eigens für dieses Beispiel erstellt. Frei veränderbar und für die Lehre wiederverwendbar (CC0-Lizenz, siehe `LICENSE`).
 
 ## Einfach starten: Java, Python oder nur die Werkstatt
 

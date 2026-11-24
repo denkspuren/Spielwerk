@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spielwerkstatt – Szenen gestalten</title>
+<link rel="stylesheet" href="/editor/editor.css">
+<link rel="stylesheet" href="/editor/scene/scene.css">
+<script src="/editor/scene/scene-model.js" defer></script>
+<script src="/editor/codegen/registry.js" defer></script>
+<script src="/editor/codegen/java.js" defer></script>
+<script src="/editor/codegen/python.js" defer></script>
+<script src="/editor/scene/scene.js" defer></script>
+</head>
+<body>
+<header class="topbar">
+  <div><p class="eyebrow">SPIELWERK <span>/</span> GRAFIKWERKSTATT</p><h1>Szeneneditor</h1>
+  <p class="sub">Figuren auf dem Spielfeld anordnen. Die Spiellogik bleibt in Java oder Python.</p></div>
+  <div class="topactions"><a class="outline" href="/editor">← Figureneditor</a><a class="outline" href="/">Zum Spiel</a>
+  <span id="save-state" role="status">Lade …</span><button id="save-scene" class="primary">Szene speichern</button></div>
+</header>
+<main class="layout scene-layout">
+ <aside class="panel left"><h2>Figurenbibliothek</h2><p class="hint">Figur auswählen und auf die Spielfläche setzen.</p>
+  <div id="palette" class="list"></div><p id="empty-palette" class="hint" hidden>Keine Figuren gefunden. Gestalte zuerst eine Figur im <a href="/editor">Figureneditor</a> und speichere sie.</p>
+  <div class="separator"></div><h2>Objekte in der Szene</h2><div id="objects" class="list"></div>
+  <div class="row"><button id="duplicate-object">Duplizieren</button><button id="delete-object" class="warn">Entfernen</button></div>
+  <p class="hint">Statisch: beim Laden sichtbar. Dynamisch: erst nach CREATE/MOVE/SHOW durch das Spielprogramm.</p>
+ </aside>
+ <section class="panel middle"><div class="section-header"><div><h2 id="scene-title">Spielfeld</h2>
+  <p class="hint">Objekte mit der Maus ziehen oder mit Pfeiltasten verschieben. Umschalt+Pfeil: 10 px.</p></div></div>
+  <div id="scene-workarea"><div id="scene-frame"></div></div>
+  <div class="bottom-toolbar"><label>Zoom <select id="zoom"><option value="0.5">50 %</option><option value="0.75" selected>75 %</option><option value="1">100 %</option><option value="1.25">125 %</option></select></label>
+   <label class="checkbox"><input id="snap-grid" type="checkbox" checked> Am Raster einrasten</label>
+   <label>Raster <select id="grid-size"><option value="5">5 px</option><option value="10" selected>10 px</option><option value="20">20 px</option></select></label>
+   <label class="checkbox"><input id="show-grid" type="checkbox" checked> Raster anzeigen</label>
+   <button id="center-object">Auswahl zentrieren</button></div>
+  <div class="help">Die Szenendatei enthält nur Positionen, Vorlagen und statisch/dynamisch. <strong>Der Spielcode wird niemals automatisch verändert.</strong> Dynamische Figuren erscheinen im Spiel erst, wenn Dein Programm sie erzeugt.</div>
+ </section>
+ <aside class="panel right"><h2>Szene</h2><div class="properties"><label>Spielfeldbreite<input id="scene-width" type="number" disabled></label><label>Spielfeldhöhe<input id="scene-height" type="number" disabled></label>
+  <label class="full">Hintergrundfarbe<input id="background" type="color" value="#12243b"></label></div>
+  <p class="hint">Die Spielfeldgröße kommt aus <code>game.ini</code> (ohne Datei: 640 × 480). Zum Ändern bitte dort bearbeiten.</p>
+  <div class="separator"></div><h2>Ausgewähltes Objekt</h2>
+  <div id="object-form" class="properties"><p class="hint">Zuerst links eine Figur hinzufügen.</p></div>
+  <div class="separator"></div><h2>Kopiervorlage für Spielprogramme</h2>
+  <label class="snippet-picker">Sprache<select id="snippet-language"><option value="java">Java</option><option value="python">Python</option></select></label>
+  <pre id="snippet-code" class="code"></pre><button id="copy-code" class="wide">Code kopieren</button>
+  <p class="hint">Enthält ausschließlich dynamische Objekte. Statische Objekte erscheinen automatisch. Kein automatisches Einfügen in Quelldateien.</p>
+ </aside>
+</main><div id="toast" class="toast" role="alert" hidden></div>
+</body></html>

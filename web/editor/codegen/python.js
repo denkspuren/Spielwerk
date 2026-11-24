@@ -16,5 +16,14 @@ ${name}_KOLLISION_HOEHE = ${h.h}
 # Beispiel: im Spielstart ausgeben
 print(f"CREATE held {${name}_VORLAGE}", flush=True)
 print("MOVE held 100 100", flush=True)`;
+  },
+  generateScene({scene}) {
+    const lines=scene.objects.filter(o=>o.mode==='dynamic').flatMap(o=>[
+      `print("CREATE ${o.id} ${o.template}", flush=True)`,
+      `print("MOVE ${o.id} ${o.x} ${o.y}", flush=True)`,
+      `print("SHOW ${o.id}", flush=True)`
+    ]);
+    return '# Kopiervorlage für Python. Keine automatische Änderung.\n'+
+      (lines.length?lines.join('\n'):'# Keine dynamischen Objekte in dieser Szene.')+'\n';
   }
 });

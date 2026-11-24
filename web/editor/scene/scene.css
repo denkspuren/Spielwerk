@@ -1,0 +1,14 @@
+.scene-layout{grid-template-columns:minmax(220px,1fr) minmax(470px,2.6fr) minmax(260px,1.1fr)}
+#scene-workarea{min-height:425px;height:min(69vh,740px);margin:15px 0;background:#0b1627;border:1px solid #364963;border-radius:10px;overflow:auto;display:flex;align-items:safe center;justify-content:safe center;padding:20px}
+#scene-frame{flex:none;position:relative;transform-origin:top left}
+#palette button{min-height:46px;justify-content:space-between;align-items:center}
+#palette button small{font-variant-numeric:tabular-nums}
+#objects .static small{color:#a5e9c8}#objects .dynamic small{color:#ffdeaa}
+#scene-frame .scene-static{display:block}
+#scene-width:disabled,#scene-height:disabled{opacity:.75}
+#object-form .notice{color:#92a9c3;font-size:11px;grid-column:span 2}
+#object-form select{max-width:100%}
+#scene-workarea:focus-within{outline:1px solid #578fc4}
+.scene-layout a{color:#a7dcff}
+@media(max-width:1120px){.scene-layout{grid-template-columns:240px minmax(0,1fr)}.scene-layout .right{grid-column:1/-1}}
+@media(max-width:740px){.scene-layout{grid-template-columns:1fr}.scene-layout .right{grid-column:auto}.scene-layout .middle{min-height:460px}#scene-workarea{height:435px}}

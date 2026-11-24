@@ -4,6 +4,7 @@ Identische Endpunkte wie EditorModule.java, nur Python-Standardbibliothek.
 Der HTTP-Router delegiert ausschließlich /editor* und /game/spielwerk/* an dieses Modul.
 """
 from pathlib import Path
+from scene_module import SceneFiles
 from urllib.parse import unquote
 import json
 import os
@@ -21,8 +22,11 @@ class EditorFiles:
         self.game_dir = game_dir
         self.web = web / 'editor'
         self.output_dir = game_dir / 'spielwerk'
+        self.scene = SceneFiles(game_dir, self.web)
 
     def get(self, handler, path: str) -> bool:
+        if self.scene.get(handler, path):
+            return True
         if path.startswith('/game/spielwerk/'):
             filename = path[len('/game/spielwerk/'):]
             if filename not in ('scene.html', 'style.css'):
@@ -55,6 +59,8 @@ class EditorFiles:
             return False
         if not self._trusted(handler):
             handler._send(b'Forbidden', 'text/plain', 403)
+            return True
+        if self.scene.post(handler, path):
             return True
         if path == '/editor/api/save':
             self._save(handler)

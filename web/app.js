@@ -35,13 +35,17 @@
     field.innerHTML = await response.text();
     field.style.background = ''; // alte Szenenfarbe vor jedem Reset zurücksetzen
     // Optionaler Editor-Export: getrennt von bestehenden scene.html/Templates.
-    const extra = await fetch("/game/spielwerk/scene.html", {cache:"no-store"});
-    if (extra.ok) field.insertAdjacentHTML("beforeend", await extra.text());
+    if (document.body.dataset.workshopTemplates === "true") {
+      const extra = await fetch("/game/spielwerk/scene.html", {cache:"no-store"});
+      if (!extra.ok) throw new Error("Werkstatt-Vorlagen konnten nicht geladen werden (HTTP " + extra.status + ")");
+      field.insertAdjacentHTML("beforeend", await extra.text());
+    }
     // Sprachneutrale Szenenbeschreibung: nur statische Objekte werden automatisch
     // dargestellt. Dynamische Objekte bleiben vollständig dem Spielprogramm vorbehalten.
-    try {
-      const layoutResponse = await fetch("/game/spielwerk/layout.json", {cache:"no-store"});
-      if (layoutResponse.ok) {
+    if (document.body.dataset.workshopLayout === "true") {
+      try {
+        const layoutResponse = await fetch("/game/spielwerk/layout.json", {cache:"no-store"});
+        if (!layoutResponse.ok) throw new Error("HTTP " + layoutResponse.status);
         const scene = await layoutResponse.json();
         if (scene.version === 1 && Array.isArray(scene.objects)) {
           if (/^#[0-9a-f]{6}$/i.test(scene.background)) field.style.background = scene.background;
@@ -60,8 +64,8 @@
             field.appendChild(el);
           }
         }
-      }
-    } catch(err) { appendLog("Szene konnte nicht geladen werden: " + err.message); }
+      } catch(err) { appendLog("Szene konnte nicht geladen werden: " + err.message); }
+    }
     instructions.textContent = field.querySelector("[data-instructions]")?.dataset.instructions || "Pfeiltasten / Leertaste";
     field.focus({preventScroll:true});
   }

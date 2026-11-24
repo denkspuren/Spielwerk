@@ -1,4 +1,4 @@
 @echo off
 cd /d "%~dp0"
-py -3 server.py games/space_invaders/SpaceInvaders.java %*
+java server-java/ArcadeServer.java games/space_invaders/SpaceInvaders.java %*
 pause

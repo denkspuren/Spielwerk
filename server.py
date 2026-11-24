@@ -454,6 +454,14 @@ def handler_factory(manager: GameManager):
         server_version = "JavaArcade/1.0"
         protocol_version = "HTTP/1.1"
 
+        def handle(self) -> None:
+            # Browser tabs may close an idle keep-alive connection abruptly.
+            # The default socketserver prints a long traceback for this normal case.
+            try:
+                super().handle()
+            except (ConnectionResetError, ConnectionAbortedError, BrokenPipeError):
+                pass
+
         def do_GET(self) -> None:
             path = urlsplit(self.path).path
             if editor.get(self, path):
@@ -472,6 +480,14 @@ def handler_factory(manager: GameManager):
                 return
             if path == "/":
                 template = (WEB / "index.html").read_text(encoding="utf-8")
+                workshop = manager.game_dir / "spielwerk"
+
+                def has_workshop_file(name: str) -> bool:
+                    candidate = workshop / name
+                    return (not workshop.is_symlink() and not candidate.is_symlink() and
+                            candidate.is_file() and
+                            candidate.resolve().is_relative_to(manager.game_dir.resolve()))
+
                 for key, value in {
                     "TITLE": html.escape(manager.config.title, quote=True),
                     "WIDTH": str(manager.config.width),
@@ -480,6 +496,10 @@ def handler_factory(manager: GameManager):
                     "MAIN": html.escape(manager.main_file.name, quote=True),
                     "LANGUAGE": "Python" if manager.language == "python" else "Java",
                     "EXTENSION": ".py" if manager.language == "python" else ".java",
+                    "WORKSHOP_CSS_LINK": ('<link rel="stylesheet" href="/game/spielwerk/style.css">'
+                                          if has_workshop_file("style.css") else ""),
+                    "WORKSHOP_TEMPLATES": "true" if has_workshop_file("scene.html") else "false",
+                    "WORKSHOP_LAYOUT": "true" if has_workshop_file("layout.json") else "false",
                 }.items():
                     template = template.replace("{{" + key + "}}", value)
                 self._send(template.encode("utf-8"), "text/html; charset=utf-8")

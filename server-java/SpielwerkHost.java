@@ -171,7 +171,18 @@ public class SpielwerkHost {
                 .replace("{{TICK}}", Integer.toString(cfg.tickMs()))
                 .replace("{{MAIN}}", escapeHtml(manager.mainFile.getFileName().toString()))
                 .replace("{{LANGUAGE}}", manager.python ? "Python" : "Java")
-                .replace("{{EXTENSION}}", manager.python ? ".py" : ".java");
+                .replace("{{EXTENSION}}", manager.python ? ".py" : ".java")
+                .replace("{{WORKSHOP_CSS_LINK}}", hasWorkshopFile("style.css")
+                        ? "<link rel=\"stylesheet\" href=\"/game/spielwerk/style.css\">" : "")
+                .replace("{{WORKSHOP_TEMPLATES}}", Boolean.toString(hasWorkshopFile("scene.html")))
+                .replace("{{WORKSHOP_LAYOUT}}", Boolean.toString(hasWorkshopFile("layout.json")));
+    }
+
+    private boolean hasWorkshopFile(String filename) {
+        Path dir = manager.gameDir.resolve("spielwerk");
+        Path file = dir.resolve(filename);
+        return !Files.isSymbolicLink(dir) && !Files.isSymbolicLink(file) &&
+                Files.isRegularFile(file) && file.toAbsolutePath().normalize().startsWith(manager.gameDir);
     }
 
     private static String escapeHtml(String s) {

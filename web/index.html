@@ -4,12 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{TITLE}} · Spielwerk</title>
+  <link rel="icon" href="data:,">
   <link rel="stylesheet" href="/static/app.css">
   <link rel="stylesheet" href="/game/style.css">
-  <link rel="stylesheet" href="/game/spielwerk/style.css">
+  {{WORKSHOP_CSS_LINK}}
   <script src="/static/app.js" defer></script>
 </head>
-<body data-width="{{WIDTH}}" data-height="{{HEIGHT}}">
+<body data-width="{{WIDTH}}" data-height="{{HEIGHT}}"
+      data-workshop-templates="{{WORKSHOP_TEMPLATES}}" data-workshop-layout="{{WORKSHOP_LAYOUT}}">
   <main class="app">
     <header class="topbar">
       <div>

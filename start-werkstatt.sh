@@ -1,3 +1,3 @@
 #!/usr/bin/env sh
 cd "$(dirname "$0")" || exit 1
-exec python3 server.py games/werkstatt_demo/SpielwerkDemo.java "$@"
+exec java server-java/ArcadeServer.java games/werkstatt_demo/SpielwerkDemo.java "$@"

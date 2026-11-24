@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "width": 600,
+  "height": 380,
+  "background": "#0b1730",
+  "objects": [
+    {
+      "id": "formenLinks",
+      "template": "sw-formen",
+      "x": 56,
+      "y": 145,
+      "mode": "static"
+    },
+    {
+      "id": "roboter",
+      "template": "sw-roboter",
+      "x": 260,
+      "y": 175,
+      "mode": "dynamic"
+    }
+  ]
+}

@@ -33,9 +33,35 @@
     const response = await fetch("/game/scene.html", {cache:"no-store"});
     if (!response.ok) throw new Error("scene.html fehlt (HTTP " + response.status + ")");
     field.innerHTML = await response.text();
+    field.style.background = ''; // alte Szenenfarbe vor jedem Reset zurücksetzen
     // Optionaler Editor-Export: getrennt von bestehenden scene.html/Templates.
     const extra = await fetch("/game/spielwerk/scene.html", {cache:"no-store"});
     if (extra.ok) field.insertAdjacentHTML("beforeend", await extra.text());
+    // Sprachneutrale Szenenbeschreibung: nur statische Objekte werden automatisch
+    // dargestellt. Dynamische Objekte bleiben vollständig dem Spielprogramm vorbehalten.
+    try {
+      const layoutResponse = await fetch("/game/spielwerk/layout.json", {cache:"no-store"});
+      if (layoutResponse.ok) {
+        const scene = await layoutResponse.json();
+        if (scene.version === 1 && Array.isArray(scene.objects)) {
+          if (/^#[0-9a-f]{6}$/i.test(scene.background)) field.style.background = scene.background;
+          for (const o of scene.objects.slice(0, 200)) {
+            if (o.mode !== "static" || !/^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(o.id) ||
+                !/^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(o.template) ||
+                !Number.isInteger(o.x) || !Number.isInteger(o.y)) continue;
+            const template = document.getElementById(o.template);
+            if (!(template instanceof HTMLTemplateElement)) continue;
+            const el = template.content.firstElementChild?.cloneNode(true);
+            if (!el) continue;
+            if (document.getElementById(o.id)) { appendLog("Szenen-ID bereits vergeben: " + o.id); continue; }
+            el.id = o.id;
+            el.classList.add("game-object");
+            el.style.transform = `translate3d(${o.x}px, ${o.y}px, 0)`;
+            field.appendChild(el);
+          }
+        }
+      }
+    } catch(err) { appendLog("Szene konnte nicht geladen werden: " + err.message); }
     instructions.textContent = field.querySelector("[data-instructions]")?.dataset.instructions || "Pfeiltasten / Leertaste";
     field.focus({preventScroll:true});
   }

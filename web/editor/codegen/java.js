@@ -18,5 +18,14 @@ static void ${name.toLowerCase()}_anlegen() {
     System.out.println("CREATE held " + ${name}_VORLAGE);
     System.out.println("MOVE held 100 100");
 }`;
+  },
+  generateScene({scene}) {
+    const lines=scene.objects.filter(o=>o.mode==='dynamic').flatMap(o=>[
+      `System.out.println("CREATE ${o.id} ${o.template}");`,
+      `System.out.println("MOVE ${o.id} ${o.x} ${o.y}");`,
+      `System.out.println("SHOW ${o.id}");`
+    ]);
+    return '// Kopiervorlage für eine Java-Methode. Keine automatische Änderung.\n'+
+      (lines.length?lines.join('\n'):'// Keine dynamischen Objekte in dieser Szene.')+'\n';
   }
 });

@@ -19,7 +19,8 @@ public class ArcadeServer {
                 "-encoding", "UTF-8", "-d", build.toString(),
                 sources.resolve("SpielwerkHost.java").toString(),
                 sources.resolve("GameModule.java").toString(),
-                sources.resolve("EditorModule.java").toString());
+                sources.resolve("EditorModule.java").toString(),
+                sources.resolve("SceneModule.java").toString());
             if (status != 0) throw new IllegalStateException("Servermodule konnten nicht kompiliert werden");
             List<String> cmd = new ArrayList<>(List.of("java", "-cp", build.toString(), "SpielwerkHost"));
             cmd.addAll(List.of(args));

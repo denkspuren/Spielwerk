@@ -16,6 +16,7 @@ final class EditorModule {
     private static final int MAX_ASSET = 2_000_000;
     private static final Pattern ASSET_NAME = Pattern.compile("[A-Za-z0-9_-]{1,64}\\.(png|jpg|jpeg|gif|webp)", Pattern.CASE_INSENSITIVE);
     private final Path gameDir, editorWeb, outputDir;
+    private final SceneModule scene;
     private final int port;
 
     EditorModule(Path gameDir, Path editorWeb, int port) {
@@ -23,12 +24,14 @@ final class EditorModule {
         this.editorWeb = editorWeb.toAbsolutePath().normalize();
         this.outputDir = this.gameDir.resolve("spielwerk");
         this.port = port;
+        this.scene = new SceneModule(this.gameDir, this.editorWeb);
     }
 
     /** True: request owned by EditorModule, even when rejected with 404/403. */
     boolean handle(HttpExchange ex) throws IOException {
         String path = ex.getRequestURI().getPath();
         String method = ex.getRequestMethod();
+        if (method.equals("GET") && scene.get(ex, path)) return true;
         if (method.equals("GET") && path.startsWith("/game/spielwerk/")) {
             String name = path.substring("/game/spielwerk/".length());
             if (name.equals("scene.html") || name.equals("style.css")) serveFile(ex, outputDir.resolve(name));
@@ -55,6 +58,7 @@ final class EditorModule {
             }
         } else if (method.equals("POST")) {
             if (!trusted(ex)) { send(ex, 403, "Unzulässiger Ursprung"); return true; }
+            if (scene.post(ex, path)) return true;
             if (path.equals("/editor/api/save")) save(ex);
             else if (path.startsWith("/editor/api/assets/")) upload(ex, path.substring("/editor/api/assets/".length()));
             else send(ex, 404, "Nicht gefunden");
